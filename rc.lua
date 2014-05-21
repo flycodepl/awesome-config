@@ -10,6 +10,7 @@
 
 
 -- {{{ Libraries
+-- require("shifty") -- ./shifty
 require("awful")
 require("awful.rules")
 require("awful.autofocus")
@@ -32,17 +33,17 @@ wallpaper_dir = os.getenv("HOME") .. "/Pictures/Wallpaper" -- wallpaper dir
 
 -- taglist numerals
 --- arabic, chinese, {east|persian}_arabic, roman, thai, random
-taglist_numbers = "chinese" -- we support arabic (1,2,3...),
+taglist_numbers = "east_arabic" -- we support arabic (1,2,3...),
 
 cpugraph_enable = true -- Show CPU graph
-cputext_format = " $1%" -- %1 average cpu, %[2..] every other thread individually
+cputext_format = " $1%:$2%:$3%:$4%" -- %1 average cpu, %[2..] every other thread individually
 
 membar_enable = true -- Show memory bar
-memtext_format = " $1%" -- %1 percentage, %2 used %3 total %4 free
+memtext_format = " $2/$3MB" -- %1 percentage, %2 used %3 total %4 free
 
 date_format = "%a %m/%d/%Y %l:%M%p" -- refer to http://en.wikipedia.org/wiki/Date_(Unix) specifiers
 
-networks = {'eth0'} -- add your devices network interface here netwidget, only shows first one thats up.
+networks = {'p4p1'} -- add your devices network interface here netwidget, only shows first one thats up.
 
 require_safe('personal')
 
@@ -65,11 +66,28 @@ layouts = {
   awful.layout.suit.tile,
   awful.layout.suit.tile.bottom,
   awful.layout.suit.tile.top,
-  --awful.layout.suit.fair,
+  awful.layout.suit.fair,
   awful.layout.suit.max,
   awful.layout.suit.magnifier,
-  --awful.layout.suit.floating
+  awful.layout.suit.floating
 }
+
+-- shifty.config.tags = {
+--    trash = {
+--       layout   = awful.layout.suit.tile,
+--       wmfact   = 0.0,
+--       position = 9
+--    }
+-- }
+
+-- shifty.config.apps = {
+--    {
+--       match = {
+--          "*chrome"
+--       }
+--    }
+-- }
+-- shifty.init()
 -- }}}
 
 -- {{{ Tags
@@ -77,12 +95,12 @@ layouts = {
 -- Taglist numerals
 taglist_numbers_langs = { 'arabic', 'chinese', 'east_arabic', 'persian_arabic', }
 taglist_numbers_sets = {
-	arabic={ 1, 2, 3, 4, 5, 6, 7, 8, 9 },
-	chinese={"一", "二", "三", "四", "五", "六", "七", "八", "九", "十"},
-	east_arabic={'١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'}, -- '٠' 0
-	persian_arabic={'٠', '١', '٢', '٣', '۴', '۵', '۶', '٧', '٨', '٩'},
-	roman={'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'},
-	thai={'๑', '๒', '๓', '๔', '๕', '๖', '๗', '๘', '๙', '๑๐'},
+        arabic={ 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+        chinese={"一", "二", "三", "四", "五", "六", "七", "八", "九", "十"},
+        east_arabic={'١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'}, -- '٠' 0
+        persian_arabic={'٠', '١', '٢', '٣', '۴', '۵', '۶', '٧', '٨', '٩'},
+        roman={'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'},
+        thai={'๑', '๒', '๓', '๔', '๕', '๖', '๗', '๘', '๙', '๑๐'},
 }
 -- }}}
 
@@ -91,13 +109,13 @@ for s = 1, screen.count() do
     -- Each screen has its own tag table.
       --tags[s] = awful.tag({"一", "二", "三", "四", "五", "六", "七", "八", "九", "十"}, s, layouts[1])
       --tags[s] = awful.tag(taglist_numbers_sets[taglist_numbers], s, layouts[1])
-	if taglist_numbers == 'random' then
-		math.randomseed(os.time())
-		local taglist = taglist_numbers_sets[taglist_numbers_langs[math.random(table.getn(taglist_numbers_langs))]]
-		tags[s] = awful.tag(taglist, s, layouts[1])
-	else
-		tags[s] = awful.tag(taglist_numbers_sets[taglist_numbers], s, layouts[1])
-	end
+        if taglist_numbers == 'random' then
+                math.randomseed(os.time())
+                local taglist = taglist_numbers_sets[taglist_numbers_langs[math.random(table.getn(taglist_numbers_langs))]]
+                tags[s] = awful.tag(taglist, s, layouts[1])
+        else
+                tags[s] = awful.tag(taglist_numbers_sets[taglist_numbers], s, layouts[1])
+        end
     --tags[s] = awful.tag({ 1, 2, 3, 4, 5, 6, 7, 8, 9 }, s, layouts[1])
 end
 -- }}}
@@ -123,18 +141,18 @@ cpuicon.image = image(beautiful.widget_cpu)
 
 -- check for cpugraph_enable == true in config
 if cpugraph_enable then
-	-- Initialize widget
-	cpugraph  = awful.widget.graph()
+        -- Initialize widget
+        cpugraph  = awful.widget.graph()
 
-	-- Graph properties
-	cpugraph:set_width(40):set_height(16)
-	cpugraph:set_background_color(beautiful.fg_off_widget)
-	cpugraph:set_gradient_angle(0):set_gradient_colors({
-	   beautiful.fg_end_widget, beautiful.fg_center_widget, beautiful.fg_widget
-	})
+        -- Graph properties
+        cpugraph:set_width(40):set_height(16)
+        cpugraph:set_background_color(beautiful.fg_off_widget)
+        cpugraph:set_gradient_angle(0):set_gradient_colors({
+           beautiful.fg_end_widget, beautiful.fg_center_widget, beautiful.fg_widget
+        })
 
-	-- Register graph widget
-	vicious.register(cpugraph,  vicious.widgets.cpu,      "$1")
+        -- Register graph widget
+        vicious.register(cpugraph,  vicious.widgets.cpu,      "$1")
 end
 
 -- cpu text widget
@@ -144,16 +162,46 @@ vicious.register(cpuwidget, vicious.widgets.cpu, cputext_format, 3) -- register
 -- temperature
 tzswidget = widget({ type = "textbox" })
 vicious.register(tzswidget, vicious.widgets.thermal,
-	function (widget, args)
-		if args[1] > 0 then
-			tzfound = true
-			return " " .. args[1] .. "C°"
-		else return "" 
-		end
-	end
-	, 19, "thermal_zone0")
+        function (widget, args)
+                if args[1] > 0 then
+                        tzfound = true
+                        return " " .. args[1] .. "C°"
+                else return ""
+                end
+        end
+        , 19, "thermal_zone0")
 
 -- }}}
+
+-- GPU temperature
+gpu_tzswidget = widget({ type = "textbox" })
+vicious.register(gpu_tzswidget, vicious.widgets.gputhermal,
+        function (widget, args)
+                if args[1] > 0 then
+                        tzfound = true
+                        return " " .. args[1] .. "C°"
+                else return ""
+                end
+        end
+        , 19, "nvidia")
+
+-- }}}
+
+
+Bitcoin = {
+        update = function(self, widget)
+               cmd = "cat /tmp/btcinfo"
+               f = io.popen(cmd)
+               widget.text = f:read("*all")
+        end
+}
+btc = widget({ type = "textbox" })
+btc.text = "n/a"
+Bitcoin:update(btc)
+btctimer = timer({timeout = 5})
+btctimer:add_signal("timeout", function() Bitcoin:update(btc) end)
+btctimer:start()
+
 
 
 -- {{{ Battery state
@@ -162,15 +210,16 @@ vicious.register(tzswidget, vicious.widgets.thermal,
 batwidget = widget({ type = "textbox" })
 baticon = widget({ type = "imagebox" })
 
+
 -- Register widget
 vicious.register(batwidget, vicious.widgets.bat,
-	function (widget, args)
-		if args[2] == 0 then return ""
-		else
-			baticon.image = image(beautiful.widget_bat)
-			return "<span color='white'>".. args[2] .. "%</span>"
-		end
-	end, 61, "BAT0"
+        function (widget, args)
+                if args[2] == 0 then return ""
+                else
+                        baticon.image = image(beautiful.widget_bat)
+                        return "<span color='white'>".. args[2] .. "%</span>"
+                end
+        end, 61, "BAT0"
 )
 -- }}}
 
@@ -182,16 +231,16 @@ memicon = widget({ type = "imagebox" })
 memicon.image = image(beautiful.widget_mem)
 
 if membar_enable then
-	-- Initialize widget
-	membar = awful.widget.progressbar()
-	-- Pogressbar properties
-	membar:set_vertical(true):set_ticks(true)
-	membar:set_height(16):set_width(8):set_ticks_size(2)
-	membar:set_background_color(beautiful.fg_off_widget)
-	membar:set_gradient_colors({ beautiful.fg_widget,
-	   beautiful.fg_center_widget, beautiful.fg_end_widget
-	}) -- Register widget
-	vicious.register(membar, vicious.widgets.mem, "$1", 13)
+        -- Initialize widget
+        membar = awful.widget.progressbar()
+        -- Pogressbar properties
+        membar:set_vertical(true):set_ticks(true)
+        membar:set_height(16):set_width(8):set_ticks_size(2)
+        membar:set_background_color(beautiful.fg_off_widget)
+        membar:set_gradient_colors({ beautiful.fg_widget,
+           beautiful.fg_center_widget, beautiful.fg_end_widget
+        }) -- Register widget
+        vicious.register(membar, vicious.widgets.mem, "$1", 13)
 end
 
 -- mem text output
@@ -227,9 +276,9 @@ vicious.register(fs.s, vicious.widgets.fs, "${/media/files used_p}", 599)
 
 -- {{{ Network usage
 function print_net(name, down, up)
-	return '<span color="'
-	.. beautiful.fg_netdn_widget ..'">' .. down .. '</span> <span color="'
-	.. beautiful.fg_netup_widget ..'">' .. up  .. '</span>'
+        return '<span color="'
+        .. beautiful.fg_netdn_widget ..'">' .. down .. '/kb</span> <span color="'
+        .. beautiful.fg_netup_widget ..'">' .. up  .. '/kb</span>'
 end
 
 dnicon = widget({ type = "imagebox" })
@@ -239,16 +288,16 @@ upicon = widget({ type = "imagebox" })
 netwidget = widget({ type = "textbox" })
 -- Register widget
 vicious.register(netwidget, vicious.widgets.net,
-	function (widget, args)
-		for _,device in pairs(networks) do
-			if tonumber(args["{".. device .." carrier}"]) > 0 then
-				netwidget.found = true
-				dnicon.image = image(beautiful.widget_net)
-				upicon.image = image(beautiful.widget_netup)
-				return print_net(device, args["{"..device .." down_kb}"], args["{"..device.." up_kb}"])
-			end
-		end
-	end, 3)
+        function (widget, args)
+                for _,device in pairs(networks) do
+                        if tonumber(args["{".. device .." carrier}"]) > 0 then
+                                netwidget.found = true
+                                dnicon.image = image(beautiful.widget_net)
+                                upicon.image = image(beautiful.widget_netup)
+                                return print_net(device, args["{"..device .." down_kb}"], args["{"..device.." up_kb}"])
+                        end
+                end
+        end, 3)
 -- }}}
 
 
@@ -291,16 +340,16 @@ vicious.register(datewidget, vicious.widgets.date, date_format, 61)
 -- {{{ mpd
 
 if whereis_app('curl') and whereis_app('mpd') then
-	mpdwidget = widget({ type = "textbox" })
-	vicious.register(mpdwidget, vicious.widgets.mpd,
-		function (widget, args)
-			if args["{state}"] == "Stop" or args["{state}"] == "Pause" or args["{state}"] == "N/A"
-				or (args["{Artist}"] == "N/A" and args["{Title}"] == "N/A") then return ""
-			else return '<span color="white">музыка:</span> '..
-			     args["{Artist}"]..' - '.. args["{Title}"]
-			end
-		end
-	)
+        mpdwidget = widget({ type = "textbox" })
+        vicious.register(mpdwidget, vicious.widgets.mpd,
+                function (widget, args)
+                        if args["{state}"] == "Stop" or args["{state}"] == "Pause" or args["{state}"] == "N/A"
+                                or (args["{Artist}"] == "N/A" and args["{Title}"] == "N/A") then return ""
+                        else return '<span color="white">музыка:</span> '..
+                             args["{Artist}"]..' - '.. args["{Title}"]
+                        end
+                end
+        )
 end
 
 -- }}}
@@ -359,10 +408,10 @@ for s = 1, screen.count() do
         datewidget, dateicon,
         baticon.image and separator, batwidget, baticon or nil,
         separator, volwidget,  volbar.widget, volicon,
-        dnicon.image and separator, upicon, netwidget, dnicon or nil,
-        separator, fs.r.widget, fs.s.widget, fsicon,
-        separator, memtext, membar_enable and membar.widget or nil, memicon,
+        dnicon.image and separator, upicon, netwidget, dnicon or nil,        
+        separator, memtext, membar_enable and membar.widget or nil ,
         separator, tzfound and tzswidget or nil,
+        separator, btc, separator,
         cpugraph_enable and cpugraph.widget or nil, cpuwidget, cpuicon,
         ["layout"] = awful.widget.layout.horizontal.rightleft
     }
@@ -449,6 +498,7 @@ globalkeys = awful.util.table.join(
 )
 
 clientkeys = awful.util.table.join(
+    awful.key({ modkey,           }, "F12",    function (c) awful.util.spawn("xlock -mode star -bg black -fg white -count 1000") end),
     awful.key({ modkey,           }, "f",      function (c) c.fullscreen = not c.fullscreen  end),
     awful.key({ modkey, "Shift"   }, "c",      function (c) c:kill()                         end),
     awful.key({ modkey,           }, "t",  awful.client.floating.toggle                     ),
@@ -584,7 +634,7 @@ mytimer:add_signal("timeout", function()
 
   -- tell awsetbg to randomly choose a wallpaper from your wallpaper directory
   if file_exists(wallpaper_dir) and whereis_app('feh') then
-	  os.execute(wallpaper_cmd)
+          os.execute(wallpaper_cmd)
   end
   -- stop the timer (we don't need multiple instances running at the same time)
   mytimer:stop()
