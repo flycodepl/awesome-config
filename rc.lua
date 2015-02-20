@@ -498,7 +498,8 @@ globalkeys = awful.util.table.join(
 )
 
 clientkeys = awful.util.table.join(
-    awful.key({ modkey,           }, "F12",    function (c) awful.util.spawn("xlock -mode star -bg black -fg white -count 1000") end),
+    awful.key({ modkey,           }, "F12",    function (c) awful.util.spawn("xlock -mode maze -bg black -fg white -count 1000") end),
+    awful.key({ modkey,           }, "F11",    function (c) awful.util.spawn("xscreensaver-command -lock") end),
     awful.key({ modkey,           }, "f",      function (c) c.fullscreen = not c.fullscreen  end),
     awful.key({ modkey, "Shift"   }, "c",      function (c) c:kill()                         end),
     awful.key({ modkey,           }, "t",  awful.client.floating.toggle                     ),
